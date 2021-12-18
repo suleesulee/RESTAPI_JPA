@@ -1,12 +1,11 @@
 package com.example.jpa.notice.controller;
 
 import com.example.jpa.notice.entity.Notice;
-import com.example.jpa.notice.entity.NoticeInput;
+import com.example.jpa.notice.model.NoticeInput;
 import com.example.jpa.notice.exception.AlreadyDeletedException;
 import com.example.jpa.notice.exception.DuplicateNoticeException;
 import com.example.jpa.notice.exception.NoticeNotFoundException;
 import com.example.jpa.notice.model.NoticeDeleteInput;
-import com.example.jpa.notice.model.NoticeModel;
 import com.example.jpa.notice.model.ResponseError;
 import com.example.jpa.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

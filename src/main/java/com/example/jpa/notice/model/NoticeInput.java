@@ -1,4 +1,4 @@
-package com.example.jpa.notice.entity;
+package com.example.jpa.notice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
