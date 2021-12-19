@@ -8,10 +8,7 @@ import com.example.jpa.user.entity.User;
 import com.example.jpa.user.exception.ExistsEmailException;
 import com.example.jpa.user.exception.PasswordNotMatchException;
 import com.example.jpa.user.exception.UserNotFoundException;
-import com.example.jpa.user.model.UserInput;
-import com.example.jpa.user.model.UserInputPassword;
-import com.example.jpa.user.model.UserResponse;
-import com.example.jpa.user.model.UserUpdate;
+import com.example.jpa.user.model.*;
 import com.example.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,6 +23,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -245,6 +243,39 @@ public class ApiUserController {
         return ResponseEntity.ok().build();
     }
 
+    /*사용자 아이디를 찾는 API */
+    @GetMapping("/api/user")
+    public ResponseEntity<?> findUser(@RequestBody UserInputFind userInputFind){
+        User user = userRepository.findByUserNameAndPhone(userInputFind.getUserName(), userInputFind.getPhone())
+                .orElseThrow(()->new UserNotFoundException("사용자 정보가 없습니다."));
 
+        UserResponse userResponse = UserResponse.of(user);
 
+        return ResponseEntity.ok().body(userResponse);
+    }
+
+    @GetMapping("/api/user/{id}/password/reset")
+    public ResponseEntity<?> resetUserPassword(@PathVariable Long id){
+        User user = userRepository.findById(id)
+                .orElseThrow(()->new UserNotFoundException("사용자 정보가 없습니다."));
+
+        //비밀번호 초기화
+        String resetPassword = getResetPassword();
+        String resetEncryptPassword = getEncryptPassword((getResetPassword()));
+        user.setPassword(resetEncryptPassword);
+        userRepository.save(user);
+        String message = String.format("[%s]님의 임시비밀번호가 [%s]로 초기화 되었습니다.", user.getUserName(), resetPassword);
+        sendSMS(message);
+
+        return ResponseEntity.ok().build();
+    }
+
+    private String getResetPassword() {
+        return UUID.randomUUID().toString().replaceAll("-","").substring(0, 10);
+    }
+
+    void sendSMS(String message) {
+        System.out.println("[문자메시지 전송]");
+        System.out.println(message);
+    }
 }
