@@ -1,17 +1,16 @@
 package com.example.jpa.user.controller;
 
 import com.example.jpa.notice.entity.Notice;
+import com.example.jpa.notice.entity.NoticeLike;
 import com.example.jpa.notice.model.NoticeResponse;
 import com.example.jpa.notice.model.ResponseError;
+import com.example.jpa.notice.repository.NoticeLikeRepository;
 import com.example.jpa.notice.repository.NoticeRepository;
 import com.example.jpa.user.entity.User;
 import com.example.jpa.user.exception.ExistsEmailException;
 import com.example.jpa.user.exception.PasswordNotMatchException;
 import com.example.jpa.user.exception.UserNotFoundException;
-import com.example.jpa.user.model.UserInput;
-import com.example.jpa.user.model.UserInputPassword;
-import com.example.jpa.user.model.UserResponse;
-import com.example.jpa.user.model.UserUpdate;
+import com.example.jpa.user.model.*;
 import com.example.jpa.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,6 +25,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +33,7 @@ public class ApiUserController {
 
     private final UserRepository userRepository;
     private final NoticeRepository noticeRepository;
+    private final NoticeLikeRepository noticeLikeRepository;
 
     /*Valid를 이용해서 Userinput에서 잘못된 값들이 들어오는 부분에 대한 에러 처리*/
     /*@PostMapping("/api/user")
@@ -245,6 +246,53 @@ public class ApiUserController {
         return ResponseEntity.ok().build();
     }
 
+    /*사용자 아이디를 찾는 API */
+    @GetMapping("/api/user")
+    public ResponseEntity<?> findUser(@RequestBody UserInputFind userInputFind){
+        User user = userRepository.findByUserNameAndPhone(userInputFind.getUserName(), userInputFind.getPhone())
+                .orElseThrow(()->new UserNotFoundException("사용자 정보가 없습니다."));
+
+        UserResponse userResponse = UserResponse.of(user);
+
+        return ResponseEntity.ok().body(userResponse);
+    }
+
+    @GetMapping("/api/user/{id}/password/reset")
+    public ResponseEntity<?> resetUserPassword(@PathVariable Long id){
+        User user = userRepository.findById(id)
+                .orElseThrow(()->new UserNotFoundException("사용자 정보가 없습니다."));
+
+        //비밀번호 초기화
+        String resetPassword = getResetPassword();
+        String resetEncryptPassword = getEncryptPassword((getResetPassword()));
+        user.setPassword(resetEncryptPassword);
+        userRepository.save(user);
+        String message = String.format("[%s]님의 임시비밀번호가 [%s]로 초기화 되었습니다.", user.getUserName(), resetPassword);
+        sendSMS(message);
+
+        return ResponseEntity.ok().build();
+    }
+
+    private String getResetPassword() {
+        return UUID.randomUUID().toString().replaceAll("-","").substring(0, 10);
+    }
+
+    void sendSMS(String message) {
+        System.out.println("[문자메시지 전송]");
+        System.out.println(message);
+    }
 
 
+    /*내가 좋아요한 공지사항을 보는 API
+    * NoticeLike Entity 추가
+    *
+    * */
+    @GetMapping("/api/user/{id}/notice/like")
+    public List<NoticeLike> likeNotice(@PathVariable Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(()->new UserNotFoundException("사용자 정보가 없습니다."));
+
+        List<NoticeLike> noticeLikeList = noticeLikeRepository.findByUser(user);
+        return noticeLikeList;
+    }
 }
