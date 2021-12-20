@@ -257,6 +257,7 @@ public class ApiUserController {
         return ResponseEntity.ok().body(userResponse);
     }
 
+
     @GetMapping("/api/user/{id}/password/reset")
     public ResponseEntity<?> resetUserPassword(@PathVariable Long id){
         User user = userRepository.findById(id)
@@ -284,15 +285,16 @@ public class ApiUserController {
 
 
     /*내가 좋아요한 공지사항을 보는 API
-    * NoticeLike Entity 추가
-    *
-    * */
+     * NoticeLike Entity 추가
+     *
+     * */
     @GetMapping("/api/user/{id}/notice/like")
     public List<NoticeLike> likeNotice(@PathVariable Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(()->new UserNotFoundException("사용자 정보가 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException("사용자 정보가 없습니다."));
 
         List<NoticeLike> noticeLikeList = noticeLikeRepository.findByUser(user);
         return noticeLikeList;
     }
+
 }
