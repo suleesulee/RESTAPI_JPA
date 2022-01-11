@@ -5,7 +5,8 @@ spring:
       path: /h2-console
 
   datasource:
-    url: jdbc:h2:mem:backofficeDb
+    #url: jdbc:h2:mem:backofficeDb
+    url: jdbc:h2:file:C:\Users\seong\OneDrive\Lecture\2. zerobase\Zerobase - Backend\jpa100\fastcampus\sample\backofficeDb
     driver-class-name: org.h2.Driver
     username: root
     password: '1111'
@@ -20,3 +21,6 @@ spring:
       hibernate:
         show-sql: true
 
+logging:
+  file:
+    name: ./logs/spring-jpa.log
