@@ -24,3 +24,10 @@ spring:
 logging:
   file:
     name: ./logs/spring-jpa.log
+
+
+###네이버 API정보
+
+naver-api:
+  client-id: ddd
+  client-secret: dsfsdf

@@ -1,7 +1,7 @@
 package com.example.jpa.extra.controller;
 
 import com.example.jpa.common.model.ResponseResult;
-import com.example.jpa.extra.model.KakaoTranslateInput;
+import com.example.jpa.common.properties.NaverApiProperties;
 import com.example.jpa.extra.model.NaverTranslateInput;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +21,8 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 public class ApiExtraNaverController {
 
+    private final NaverApiProperties naverAppProperties;
+    /*
     @GetMapping("/api/extra/naver/translate")
     public ResponseEntity<?> translate(@RequestBody NaverTranslateInput naverTranslateInput) {
 
@@ -46,6 +48,35 @@ public class ApiExtraNaverController {
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, formEntity, String.class);
 
         return ResponseResult.success(responseEntity.getBody());
+    }     */
 
+    
+    //  프로퍼티로 활용
+    @GetMapping("/api/extra/naver/translate")
+    public ResponseEntity<?> translate(@RequestBody NaverTranslateInput naverTranslateInput) {
+
+        String clientId = naverAppProperties.getClientId();
+        String clientSecret = naverAppProperties.getClientSecret();
+
+        String url = "http://openapi.naver.com/v1/papago/n2mt";
+
+        RestTemplate restTemplate = new RestTemplate();
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+        parameters.add("source", "ko");
+        parameters.add("target", "en");
+        parameters.add("text", naverTranslateInput.getText());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add("X-Naver-Client-Id", clientId);
+        headers.add("X-Naver-Client-Secret", clientSecret);
+
+
+        HttpEntity formEntity = new HttpEntity<>(parameters, headers);
+
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, formEntity, String.class);
+
+        return ResponseResult.success(responseEntity.getBody());
     }
+
 }
