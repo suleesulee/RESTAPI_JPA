@@ -1,15 +1,13 @@
 package com.example.jpa.user.service;
 
 import com.example.jpa.board.model.ServiceResult;
+import com.example.jpa.common.MailComponent;
 import com.example.jpa.common.exception.BizException;
 import com.example.jpa.logs.service.LogsService;
 import com.example.jpa.notice.model.UserStatus;
 import com.example.jpa.user.entity.User;
 import com.example.jpa.user.entity.UserInterest;
-import com.example.jpa.user.model.UserLogCount;
-import com.example.jpa.user.model.UserLogin;
-import com.example.jpa.user.model.UserNoticeCount;
-import com.example.jpa.user.model.UserSummary;
+import com.example.jpa.user.model.*;
 import com.example.jpa.user.repository.UserCustomRepository;
 import com.example.jpa.user.repository.UserInterestRepository;
 import com.example.jpa.user.repository.UserRepository;
@@ -28,7 +26,7 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final UserCustomRepository userCustomRepository;
     private final UserInterestRepository userInterestRepository;
-
+    private final MailComponent mailComponent;
     @Override
     public UserSummary getUserStatusCount() {
         long usingUserCount = userRepository.countByStatus(UserStatus.Using);
@@ -147,5 +145,39 @@ public class UserServiceImpl implements UserService{
     @Override
     public void sendServiceNotice() {
 
+    }
+
+    @Override
+    public ServiceResult addUser(UserInput userInput) {
+        Optional<User> optionalUser = userRepository.findByEmail(userInput.getEmail());
+        if(optionalUser.isPresent()){
+            return ServiceResult.fail("이미 가입된 이메일 입니다..");
+        }
+
+        String encryptPassword = PasswordUtils.encryptedPassword(userInput.getPassword());
+
+        User user = User.builder()
+                .email(userInput.getEmail())
+                .userName(userInput.getUserName())
+                .regDate(LocalDateTime.now())
+                .password(encryptPassword)
+                .phone(userInput.getPhone())
+                .status(UserStatus.Using)
+                .build();
+        userRepository.save(user);
+        
+        //메일을 전송
+
+        String fromEmail = "dfdf";
+        String fromName = "관리자";
+        String toEmail = user.getEmail();
+        String toName = user.getUserName();
+
+        String title="회원가입을 축하함";
+        String contents = "냉무";
+
+        mailComponent.send(fromEmail, fromName, toEmail, toName, title, contents);
+
+        return ServiceResult.success();
     }
 }

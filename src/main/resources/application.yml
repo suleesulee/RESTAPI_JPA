@@ -20,7 +20,17 @@ spring:
       format_sql: true
       hibernate:
         show-sql: true
-
+  mail:
+    username:
+    password:
+    host: smtp.gmail.com
+    port: 587
+    property:
+      mail:
+        smtp:
+          suth: true
+          starttls:
+            enable: true
 logging:
   file:
     name: ./logs/spring-jpa.log

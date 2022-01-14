@@ -21,6 +21,7 @@ import com.example.jpa.user.exception.UserNotFoundException;
 import com.example.jpa.user.model.*;
 import com.example.jpa.user.repository.UserRepository;
 import com.example.jpa.user.service.PointService;
+import com.example.jpa.user.service.UserService;
 import com.example.jpa.util.JWTUtils;
 import com.example.jpa.util.PasswordUtils;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,7 @@ public class ApiUserController {
     private final BoardService boardService;
 
     private final PointService pointService;
+    private final UserService userService;
 
     /*Valid를 이용해서 Userinput에서 잘못된 값들이 들어오는 부분에 대한 에러 처리*/
     /*@PostMapping("/api/user")
@@ -469,5 +471,15 @@ public class ApiUserController {
         return ResponseResult.result(result);
 
     }
+
+    //사용자 추가하는 API
+    @PostMapping("/api/public/user")
+    public ResponseEntity<?> addUser(@RequestBody UserInput userInput) {
+        ServiceResult result = userService.addUser(userInput);
+        return ResponseResult.result(result);
+    }
+
+
+
 
 }

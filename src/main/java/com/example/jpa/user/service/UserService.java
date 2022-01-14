@@ -2,10 +2,7 @@ package com.example.jpa.user.service;
 
 import com.example.jpa.board.model.ServiceResult;
 import com.example.jpa.user.entity.User;
-import com.example.jpa.user.model.UserLogCount;
-import com.example.jpa.user.model.UserLogin;
-import com.example.jpa.user.model.UserNoticeCount;
-import com.example.jpa.user.model.UserSummary;
+import com.example.jpa.user.model.*;
 
 import java.util.List;
 
@@ -30,5 +27,7 @@ public interface UserService {
     User login(UserLogin userLogin);
 
     void sendServiceNotice();
+
+    ServiceResult addUser(UserInput userInput);
 
 }
