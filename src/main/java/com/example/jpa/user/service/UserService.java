@@ -30,4 +30,6 @@ public interface UserService {
 
     ServiceResult addUser(UserInput userInput);
 
+    ServiceResult resetPassword(UserPasswordResetInput userPasswordResetInput);
+
 }

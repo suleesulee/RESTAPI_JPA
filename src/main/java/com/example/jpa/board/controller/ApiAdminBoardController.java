@@ -31,4 +31,11 @@ public class ApiAdminBoardController {
             return ResponseResult.success(list);
     }
 
+    //문의 게시판 글에 답변을 달았을때 메일로 답변 정보를 전송하는 API
+    @PostMapping("/api/admin/board/{id}/reply")
+    public ResponseEntity<?> reply(@PathVariable Long id, @RequestBody BoardReplyInput boardReplyInput){
+        ServiceResult result = boardService.replyBoard(id, boardReplyInput);
+        return ResponseResult.result(result);
+    }
+
 }

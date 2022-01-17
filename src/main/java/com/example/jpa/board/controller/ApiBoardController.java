@@ -253,4 +253,16 @@ public class ApiBoardController {
         ServiceResult result = boardService.add(email, boardInput);
         return ResponseResult.result(result);
     }
-}
+
+    //게시판에 글을 작성했을 때 사용자에게 작서오딘 글의 정보를 메일로 전송하는 API
+    @PostMapping("/api/board")
+    public ResponseEntity<?> add(@RequestHeader("F-TOKEN") String token,
+                                  @RequestBody BoardInput boardInput){
+
+        String email = JWTUtils.getIssuer(token);
+        ServiceResult result = boardService.add(email, boardInput);
+        return ResponseResult.result(result);
+
+
+
+    }}
